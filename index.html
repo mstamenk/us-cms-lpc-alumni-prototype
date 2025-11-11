@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>US‑CMS / LPC Alumni Network</title>
+  <!-- Typography & icons (adjust as you like) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.13.0/tabler-icons.min.css">
+  <!-- Chart.js for the cumulative impact plot -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root{
+      /* Easy theming knobs — set these close to your site’s palette */
+      --bg: #0d0e11;            /* near‑black background */
+      --surface: #14161b;       /* card background */
+      --text: #e7e9ee;          /* primary text */
+      --muted: #a9afbd;         /* secondary text */
+      --primary: #7dd3fc;       /* accent (light-cyan) */
+      --primary-strong: #38bdf8;/* stronger accent */
+      --link: #8bafff;          /* link color */
+      --ok: #34d399;            /* green */
+      --warn: #fbbf24;          /* amber */
+      --danger: #f87171;        /* red */
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 800px at 20% -10%, #19202a 0%, transparent 60%),
+                  radial-gradient(1000px 800px at 120% 10%, #1a1c28 0%, transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      line-height:1.5;
+    }
+    a{color:var(--link); text-decoration:none}
+    a:hover{text-decoration:underline}
+    .wrap{max-width:1100px;margin:0 auto;padding:28px}
+
+    /* Header */
+    header{
+      position:sticky;top:0;z-index:20;background:rgba(13,14,17,0.7);backdrop-filter: blur(10px);
+      border-bottom:1px solid rgba(255,255,255,0.04);
+    }
+    .nav{
+      display:flex;align-items:center;gap:18px;justify-content:space-between;max-width:1100px;margin:0 auto;padding:14px 28px;
+    }
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{
+      width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--primary-strong),#a78bfa);
+      display:grid;place-items:center;color:#0b111b;font-weight:800;letter-spacing:0.5px
+    }
+    .title{font-weight:700;font-size:18px}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap}
+    .tab{padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.08);color:var(--muted);cursor:pointer}
+    .tab.active{border-color:rgba(125,211,252,0.6);color:var(--text);background:rgba(56,189,248,0.08)}
+
+    /* Sections */
+    main{max-width:1100px;margin:24px auto;padding:0 28px}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}
+    .card{background:var(--surface);border:1px solid rgba(255,255,255,0.06);border-radius:var(--radius);padding:18px}
+
+    /* Hero */
+    .hero{display:flex;flex-direction:column;gap:18px;margin:20px 0 10px}
+    .hero h1{font-size:28px;margin:0}
+    .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .kpi{background:linear-gradient(180deg, rgba(255,255,255,0.04), transparent 30%), var(--surface); padding:16px;border-radius:14px;border:1px solid rgba(255,255,255,0.06)}
+    .kpi .label{color:var(--muted);font-size:13px}
+    .kpi .value{font-size:22px;font-weight:700}
+
+    /* Directory list */
+    .controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+    .input, select{
+      background:#0e1117;border:1px solid rgba(255,255,255,0.08);color:var(--text);
+      padding:10px 12px;border-radius:12px;outline:none;min-width:200px
+    }
+    .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:12px;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+    .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+    .person{padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,0.06);background:linear-gradient(180deg, rgba(255,255,255,0.03), transparent 25%),#0f131a}
+    .person h4{margin:0 0 6px}
+    .meta{color:var(--muted);font-size:13px}
+    .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+    .btn{padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:#0f1621;color:var(--text);cursor:pointer}
+    .btn:hover{border-color:rgba(125,211,252,0.6)}
+
+    /* Jobs */
+    .job{padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,0.06);background:linear-gradient(180deg, rgba(255,255,255,0.03), transparent 25%),#0f131a}
+    .job h4{margin:0 0 4px}
+    .job .company{color:var(--muted)}
+    .badge{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid rgba(255,255,255,0.08);margin-left:6px}
+
+    footer{color:var(--muted);font-size:13px;margin:50px 0 24px;text-align:center}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav">
+      <div class="brand">
+        <div class="logo">AN</div>
+        <div class="title">US‑CMS / LPC Alumni Network</div>
+      </div>
+      <div class="tabs">
+        <button class="tab active" data-tab="home"><i class="ti ti-home"></i>&nbsp;Home</button>
+        <button class="tab" data-tab="directory"><i class="ti ti-users"></i>&nbsp;Directory</button>
+        <button class="tab" data-tab="jobs"><i class="ti ti-briefcase"></i>&nbsp;Jobs</button>
+        <button class="tab" data-tab="impact"><i class="ti ti-chart-line"></i>&nbsp;Impact</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section id="home" class="card">
+      <div class="hero">
+        <h1>Welcome — a privacy‑conscious alumni hub for career transitions</h1>
+        <p class="meta">Opt‑in directory • Warm intros • Curated jobs • Live outcomes dashboard</p>
+        <div class="kpis">
+          <div class="kpi"><div class="label">Members</div><div id="kpi-members" class="value">—</div></div>
+          <div class="kpi"><div class="label">Opt‑in contacts</div><div id="kpi-contacts" class="value">—</div></div>
+          <div class="kpi"><div class="label">Placements (12 mo)</div><div id="kpi-placements" class="value">—</div></div>
+        </div>
+        <div>
+          <a class="btn" id="join-link" target="_blank" rel="noopener">Join (Google Form)</a>
+          <a class="btn" href="#" onclick="switchTab('directory')">Browse directory</a>
+          <a class="btn" href="#" onclick="switchTab('jobs')">See open roles</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIRECTORY -->
+    <section id="directory" class="card" hidden>
+      <div class="controls">
+        <input id="search" class="input" placeholder="Search name, org, skills…"/>
+        <select id="filter-sector">
+          <option value="">All sectors</option>
+          <option value="industry">Industry</option>
+          <option value="academia">Academia</option>
+          <option value="govlab">Gov/Lab</option>
+        </select>
+        <select id="filter-location">
+          <option value="">All locations</option>
+        </select>
+        <label class="pill"><input type="checkbox" id="filter-contactable" style="accent-color:var(--primary-strong)"> contactable</label>
+      </div>
+      <div id="people-list" class="list"></div>
+    </section>
+
+    <!-- JOBS -->
+    <section id="jobs" class="card" hidden>
+      <div class="controls">
+        <input id="job-search" class="input" placeholder="Search title, company, tags…"/>
+        <select id="job-category">
+          <option value="">All categories</option>
+          <option>Data/AI</option>
+          <option>Hardware/ASIC</option>
+          <option>HEP/Lab</option>
+          <option>Finance/Quant</option>
+          <option>Med‑tech</option>
+          <option>Climate/Energy</option>
+          <option>Software</option>
+          <option>Faculty/Postdoc</option>
+        </select>
+      </div>
+      <div id="jobs-list" class="list"></div>
+    </section>
+
+    <!-- IMPACT -->
+    <section id="impact" class="card" hidden>
+      <div class="grid">
+        <div style="grid-column: span 12;">
+          <canvas id="impactChart" height="80"></canvas>
+        </div>
+        <div style="grid-column: span 12; display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+          <span class="pill">Cumulative placements over time</span>
+          <span class="pill">Industry vs Academia</span>
+          <span class="pill">Source: self‑reported placements in directory</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      Built with plain HTML/CSS/JS • JSON‑driven • Ready for GitHub Pages.
+      <br/>Theme knobs in <code>:root</code>. Data files in <code>/data/people.json</code> and <code>/data/jobs.json</code>.
+    </div>
+  </footer>
+
+  <script>
+    // === CONFIG — set these before deploying ===
+    const CONFIG = {
+      joinFormUrl: "https://docs.google.com/forms/d/e/REPLACE_WITH_YOUR_FORM/viewform", // <-- your Google Form
+      peopleJson:  "data/people.json",
+      jobsJson:    "data/jobs.json",
+    };
+
+    // Wire join link
+    document.getElementById('join-link').href = CONFIG.joinFormUrl;
+
+    // Simple state
+    let PEOPLE = [];
+    let JOBS = [];
+
+    // Tab switching
+    function switchTab(name){
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      document.querySelector(`.tab[data-tab="${name}"]`).classList.add('active');
+      document.querySelectorAll('main section').forEach(sec=>sec.hidden=true);
+      document.getElementById(name).hidden=false;
+      if(name==='impact' && !impactInitialized) initImpactChart();
+      history.replaceState(null, '', `#${name}`); // deep-linkable tabs
+    }
+    document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>switchTab(btn.dataset.tab)));
+
+    // Deep-link on load
+    const initHash = (location.hash||'').replace('#','');
+    if(['home','directory','jobs','impact'].includes(initHash)) switchTab(initHash);
+
+    // Fetch JSON helpers with graceful fallback
+    async function fetchJson(url){
+      try{
+        const res = await fetch(url, {cache:'no-store'});
+        if(!res.ok) throw new Error(res.status+" "+res.statusText);
+        return await res.json();
+      }catch(e){
+        console.warn('Falling back to sample for', url, e);
+        return sampleData[url] || [];
+      }
+    }
+
+    // Render Directory
+    function renderDirectory(){
+      const q = document.getElementById('search').value.toLowerCase().trim();
+      const sector = document.getElementById('filter-sector').value;
+      const loc = document.getElementById('filter-location').value;
+      const contactable = document.getElementById('filter-contactable').checked;
+
+      const filtered = PEOPLE.filter(p=>{
+        if(sector && p.sector!==sector) return false;
+        if(loc && (p.location||'')!==loc) return false;
+        if(contactable && !p.contact_ok) return false;
+        if(!q) return true;
+        const blob = [p.name, p.org, p.role, p.location, (p.skills||[]).join(' ')].join(' ').toLowerCase();
+        return blob.includes(q);
+      });
+
+      const list = document.getElementById('people-list');
+      list.innerHTML = '';
+      for(const p of filtered){
+        const el = document.createElement('div');
+        el.className='person';
+        el.innerHTML = `
+          <h4>${escapeHtml(p.name)}</h4>
+          <div class="meta">${escapeHtml(p.role||'')} at ${escapeHtml(p.org||'')}</div>
+          <div class="meta">${escapeHtml(p.location||'')}</div>
+          <div class="tags">${(p.skills||[]).slice(0,8).map(t=>`<span class="pill">${escapeHtml(t)}</span>`).join('')}</div>
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+            ${p.linkedin?`<a class="btn" target="_blank" rel="noopener" href="${encodeURI(p.linkedin)}"><i class='ti ti-brand-linkedin'></i> LinkedIn</a>`:''}
+            ${p.orcid?`<a class="btn" target="_blank" rel="noopener" href="https://orcid.org/${encodeURIComponent(p.orcid)}"><i class='ti ti-id'></i> ORCID</a>`:''}
+            ${p.contact_ok && p.email?`<a class="btn" href="mailto:${encodeURI(p.email)}"><i class='ti ti-mail'></i> Contact</a>`:''}
+          </div>
+          ${p.placement?`<div class="tags" style="margin-top:10px">
+              <span class="pill" title="Placement sector">${p.placement.sector==='industry'?'🏢':'🏫'} ${escapeHtml(capitalize(p.placement.sector))}</span>
+              <span class="pill" title="Placement date">📅 ${escapeHtml(p.placement.date)}</span>
+            </div>`:''}
+        `;
+        list.appendChild(el);
+      }
+    }
+
+    // Populate filters (locations)
+    function populateLocationFilter(){
+      const locs = Array.from(new Set(PEOPLE.map(p=>p.location).filter(Boolean))).sort();
+      const sel = document.getElementById('filter-location');
+      for(const loc of locs){
+        const opt = document.createElement('option');
+        opt.value = opt.textContent = loc;
+        sel.appendChild(opt);
+      }
+    }
+
+    // Render Jobs
+    function renderJobs(){
+      const q = document.getElementById('job-search').value.toLowerCase().trim();
+      const cat = document.getElementById('job-category').value;
+      const now = new Date();
+      const filtered = JOBS.filter(j=>{
+        if(cat && j.category!==cat) return false;
+        if(j.expires && new Date(j.expires)<now) return false;
+        if(!q) return true;
+        const blob = [j.title, j.company, j.location, (j.tags||[]).join(' ')].join(' ').toLowerCase();
+        return blob.includes(q);
+      });
+      const list = document.getElementById('jobs-list');
+      list.innerHTML='';
+      for(const j of filtered){
+        const el = document.createElement('div');
+        el.className='job';
+        const expires = j.expires?`<span class="badge" title="expires">⏳ ${escapeHtml(j.expires)}</span>`:'';
+        const remote = j.remote?`<span class="badge">remote</span>`:'';
+        el.innerHTML = `
+          <h4>${escapeHtml(j.title)} <span class="company">@ ${escapeHtml(j.company)}</span> ${remote} ${expires}</h4>
+          <div class="meta">${escapeHtml(j.location||'')}${j.visa?` · visa: ${escapeHtml(j.visa)}`:''}</div>
+          <div class="tags">${(j.tags||[]).slice(0,10).map(t=>`<span class='pill'>${escapeHtml(t)}</span>`).join('')}</div>
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+            ${j.apply_url?`<a class='btn' target='_blank' rel='noopener' href='${encodeURI(j.apply_url)}'><i class='ti ti-external-link'></i> Apply</a>`:''}
+            ${j.contact?`<a class='btn' href='mailto:${encodeURI(j.contact)}'><i class='ti ti-mail'></i> Contact</a>`:''}
+          </div>
+        `;
+        list.appendChild(el);
+      }
+    }
+
+    // Impact chart (cumulative placements from PEOPLE.placement)
+    let impactInitialized = false;
+    let impactChart;
+    function initImpactChart(){
+      if(impactInitialized) return; impactInitialized=true;
+      const ctx = document.getElementById('impactChart');
+      const series = buildCumulativeSeriesFromPeople(PEOPLE);
+      impactChart = new Chart(ctx, {
+        type:'line',
+        data:{
+          labels: series.labels,
+          datasets:[
+            {label:'Industry', data: series.industry, tension:0.2, fill:false},
+            {label:'Academia', data: series.academia, tension:0.2, fill:false}
+          ]
+        },
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          plugins:{ legend:{labels:{color:'var(--text)'}} },
+          scales:{
+            x:{ ticks:{ color:'var(--muted)'}, grid:{color:'rgba(255,255,255,0.06)'} },
+            y:{ ticks:{ color:'var(--muted)'}, grid:{color:'rgba(255,255,255,0.06)'}, beginAtZero:true, precision:0 }
+          }
+        }
+      });
+    }
+
+    function buildCumulativeSeriesFromPeople(people){
+      // Expect people[].placement = { date: 'YYYY-MM-DD', sector: 'industry'|'academia' }
+      const placements = people.filter(p=>p.placement && p.placement.date && p.placement.sector);
+      const dates = Array.from(new Set(placements.map(p=>p.placement.date))).sort();
+      if(dates.length===0){
+        return {labels:[], industry:[], academia:[]};
+      }
+      // Build daily buckets
+      const start = new Date(dates[0]);
+      const end   = new Date();
+      const labels = [];
+      const fmt = (d)=> d.toISOString().slice(0,10);
+      for(let d=new Date(start); d<=end; d.setDate(d.getDate()+7)){ // weekly step for readability
+        labels.push(fmt(d));
+      }
+      // Count cumulative
+      const inds = new Set(placements.filter(p=>p.placement.sector==='industry').map(p=>p.placement.date));
+      const acas = new Set(placements.filter(p=>p.placement.sector==='academia').map(p=>p.placement.date));
+      let ci=0, ca=0;
+      const industry=[], academia=[];
+      for(const day of labels){
+        // count new up to this label (inclusive)
+        ci += [...inds].filter(d=>d<=day).length - ci; // naive but simple with sets
+        ca += [...acas].filter(d=>d<=day).length - ca;
+        industry.push(ci);
+        academia.push(ca);
+      }
+      return {labels, industry, academia};
+    }
+
+    // KPIs (simple examples)
+    function updateKpis(){
+      const members = PEOPLE.length;
+      const contactable = PEOPLE.filter(p=>p.contact_ok).length;
+      const cutoff = new Date(); cutoff.setFullYear(cutoff.getFullYear()-1);
+      const placed12m = PEOPLE.filter(p=>p.placement && new Date(p.placement.date)>=cutoff).length;
+      document.getElementById('kpi-members').textContent = members;
+      document.getElementById('kpi-contacts').textContent = contactable;
+      document.getElementById('kpi-placements').textContent = placed12m;
+    }
+
+    // Utilities
+    function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
+    function capitalize(s){ return (s||'').charAt(0).toUpperCase()+s.slice(1); }
+
+    // Boot: load data & render
+    (async function(){
+      PEOPLE = await fetchJson(CONFIG.peopleJson);
+      JOBS = await fetchJson(CONFIG.jobsJson);
+      populateLocationFilter();
+      renderDirectory();
+      renderJobs();
+      updateKpis();
+    })();
+
+    // Live controls
+    document.getElementById('search').addEventListener('input', renderDirectory);
+    document.getElementById('filter-sector').addEventListener('change', renderDirectory);
+    document.getElementById('filter-location').addEventListener('change', renderDirectory);
+    document.getElementById('filter-contactable').addEventListener('change', renderDirectory);
+    document.getElementById('job-search').addEventListener('input', renderJobs);
+    document.getElementById('job-category').addEventListener('change', renderJobs);
+
+    // === SAMPLE DATA (used only if /data JSON files are missing) ===
+    // Create /data/people.json and /data/jobs.json in your repo to override these.
+    const sampleData = {
+      [CONFIG.peopleJson]: [
+        {
+          "name":"Alex Chen","email":"alex.chen@example.com","contact_ok":true,
+          "org":"NVIDIA","role":"Research Scientist","sector":"industry","location":"San Francisco, CA",
+          "skills":["ML","CUDA","HEP","Tracking"],
+          "linkedin":"https://www.linkedin.com/in/example","orcid":"0000-0002-1234-5678",
+          "placement": {"date":"2025-03-10","sector":"industry"}
+        },
+        {
+          "name":"Priya Patel","email":"","contact_ok":false,
+          "org":"MIT","role":"Postdoctoral Associate","sector":"academia","location":"Cambridge, MA",
+          "skills":["Jet physics","Flavour tagging","ROOT"],
+          "placement": {"date":"2024-11-08","sector":"academia"}
+        },
+        {
+          "name":"Marco Rossi","email":"marco.rossi@example.com","contact_ok":true,
+          "org":"Citadel Securities","role":"Quantitative Researcher","sector":"industry","location":"New York, NY",
+          "skills":["Statistics","C++","Python","Time series"],
+          "placement": {"date":"2025-07-01","sector":"industry"}
+        },
+        {
+          "name":"Sara Ahmed","email":"s.ahmed@example.com","contact_ok":true,
+          "org":"Argonne National Lab","role":"Research Engineer","sector":"govlab","location":"Lemont, IL",
+          "skills":["ASIC","DAQ","Firmware"],
+          "placement": null
+        }
+      ],
+      [CONFIG.jobsJson]: [
+        {
+          "title":"Applied Scientist (HEP → AI)","company":"OpenAI for Science","location":"Remote","remote":true,
+          "category":"Data/AI","tags":["PyTorch","LLMs","HEP"],
+          "apply_url":"https://example.com/jobs/123","contact":"recruiting@example.com","expires":"2026-01-15"
+        },
+        {
+          "title":"ASIC Design Engineer","company":"Synopsys","location":"Zurich, CH","remote":false,
+          "category":"Hardware/ASIC","tags":["Verilog","UVM","TSMC"],
+          "apply_url":"https://example.com/jobs/456","contact":"","expires":"2025-12-01","visa":"EU/Swiss OK"
+        },
+        {
+          "title":"Assistant Professor (Physics)","company":"State University","location":"Midwest, USA","remote":false,
+          "category":"Faculty/Postdoc","tags":["HEP","Detector","Teaching"],
+          "apply_url":"https://example.com/jobs/789","contact":"chair@example.edu","expires":"2026-02-28"
+        }
+      ]
+    };
+  </script>
+
+  <!--
+  ==============================================
+  HOW TO DEPLOY ON GITHUB PAGES (single‑repo)
+  ==============================================
+  1) Create a new public repo, e.g. `uscms-alumni`.
+  2) Add this file as `index.html` in the root of the repo.
+  3) Create a folder `data/` with two files: `people.json` and `jobs.json`.
+     Example structures:
+
+     // data/people.json
+     [
+       {
+         "name":"Full Name",
+         "email":"optional@hidden",             // will be used only if contact_ok=true
+         "contact_ok": true,                      // consent to be contacted via email
+         "org":"Company or University",
+         "role":"Job title",
+         "sector":"industry|academia|govlab",
+         "location":"City, Country/State",
+         "skills":["tag1","tag2","tag3"],
+         "linkedin":"https://linkedin.com/in/...", // optional
+         "orcid":"0000-0000-0000-0000",            // optional
+         "placement": {                              // optional; used for the impact chart
+            "date":"YYYY-MM-DD",
+            "sector":"industry|academia"
+         }
+       }
+     ]
+
+     // data/jobs.json
+     [
+       {
+         "title":"Role title",
+         "company":"Org",
+         "location":"City/Remote",
+         "remote": true,
+         "category":"Data/AI|Hardware/ASIC|HEP/Lab|Finance/Quant|Med‑tech|Climate/Energy|Software|Faculty/Postdoc",
+         "tags":["keyword","keyword"],
+         "apply_url":"https://...",
+         "contact":"email@org.com",      // optional
+         "expires":"YYYY-MM-DD",         // optional (stale posts auto‑hidden)
+         "visa":"note"                   // optional
+       }
+     ]
+
+  4) Replace CONFIG.joinFormUrl with your Google Form link.
+  5) Push to GitHub → Settings → Pages → Deploy from `main` → `/root` (or use Actions).
+  6) (Optional) Customize theme colors at the top in `:root{ ... }`.
+  7) (Optional) Set a custom favicon `AN` square.
+
+  Notes
+  - The site gracefully falls back to the built‑in sample JSON if the /data files are missing, so you can preview immediately.
+  - The Impact chart recomputes from `people.json` using `placement.date` + `placement.sector`.
+  - Add fields later without breaking anything; unknown fields are ignored.
+  - For privacy, only show `Contact` buttons for people with `contact_ok=true` and an email set.
+  - You can replace Chart.js with Plotly or similar later; API is isolated in buildCumulativeSeriesFromPeople.
+  - Want relay‑email instead of mailto? Replace the mailto with a tiny Cloudflare Worker or Apps Script endpoint.
+  -->
+</body>
+</html>
+

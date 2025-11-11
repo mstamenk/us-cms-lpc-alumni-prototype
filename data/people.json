@@ -1,0 +1,13 @@
+[
+  {
+    "name": "Marko Stamenkovic",
+    "email": "marko_stamenkovic@brown.edu",
+    "contact_ok": true,
+    "org": "Brown",
+    "role": "Postdoc",
+    "sector": "academia",
+    "location": "Chicago, IL",
+    "skills": ["Higgs", "Trigger", "Multi-Higgs"],
+    "placement": { "date": "2024-12-20", "sector": "academia" }
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "title": "Applied Scientist (HEP → AI)",
+    "company": "Awesome Company",
+    "location": "Remote",
+    "remote": true,
+    "category": "Data/AI",
+    "tags": ["PyTorch", "LLMs", "Foundations", "HEP"],
+    "apply_url": "https://example.com/jobs/123",
+    "contact": "recruiting@example.com",
+    "expires": "2026-01-15"
+  }
+]
