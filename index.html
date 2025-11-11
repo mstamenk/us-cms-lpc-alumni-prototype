@@ -13,21 +13,29 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
     :root{
-      /* Easy theming knobs — set these close to your site’s palette */
-      --bg: #0d0e11;            /* near‑black background */
-      --surface: #14161b;       /* card background */
-      --text: #e7e9ee;          /* primary text */
-      --muted: #a9afbd;         /* secondary text */
-      --primary: #7dd3fc;       /* accent (light-cyan) */
-      --primary-strong: #38bdf8;/* stronger accent */
-      --link: #8bafff;          /* link color */
-      --ok: #34d399;            /* green */
-      --warn: #fbbf24;          /* amber */
-      --danger: #f87171;        /* red */
+      /* Light theme knobs */
+      --bg: #ffffff;            /* page background */
+      --surface: #ffffff;       /* card background */
+      --text: #111111;          /* primary text */
+      --muted: #5a5f71;         /* secondary text */
+      --primary: #0ea5e9;       /* accent (cyan) */
+      --primary-strong: #0284c7;/* stronger accent */
+      --link: #0b57d0;          /* link color */
+      --ok: #16a34a;            /* green */
+      --warn: #b45309;          /* amber */
+      --danger: #dc2626;        /* red */
       --radius: 18px;
     }
     *{box-sizing:border-box}
-    html,body{height:100%}
+    html,body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(900px 600px at 15% -10%, #eef6ff 0%, transparent 60%),
+                  radial-gradient(800px 600px at 110% 0%, #f5f7fb 0%, transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      line-height:1.5;
+    }
     body{
       margin:0;
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
@@ -43,8 +51,8 @@
 
     /* Header */
     header{
-      position:sticky;top:0;z-index:20;background:rgba(13,14,17,0.7);backdrop-filter: blur(10px);
-      border-bottom:1px solid rgba(255,255,255,0.04);
+      position:sticky;top:0;z-index:20;background:rgba(255,255,255,0.7);backdrop-filter: blur(10px);
+      border-bottom:1px solid rgba(0,0,0,0.06);
     }
     .nav{
       display:flex;align-items:center;gap:18px;justify-content:space-between;max-width:1100px;margin:0 auto;padding:14px 28px;
@@ -62,7 +70,7 @@
     /* Sections */
     main{max-width:1100px;margin:24px auto;padding:0 28px}
     .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}
-    .card{background:var(--surface);border:1px solid rgba(255,255,255,0.06);border-radius:var(--radius);padding:18px}
+    .card{background:var(--surface);border:1px solid rgba(0,0,0,0.08);border-radius:var(--radius);padding:18px}
 
     /* Hero */
     .hero{display:flex;flex-direction:column;gap:18px;margin:20px 0 10px}
@@ -75,20 +83,20 @@
     /* Directory list */
     .controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
     .input, select{
-      background:#0e1117;border:1px solid rgba(255,255,255,0.08);color:var(--text);
+      background:#fff;border:1px solid rgba(0,0,0,0.12);color:var(--text);
       padding:10px 12px;border-radius:12px;outline:none;min-width:200px
     }
-    .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:12px;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+    .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:12px;border:1px solid rgba(0,0,0,0.12);color:var(--muted)}
     .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
-    .person{padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,0.06);background:linear-gradient(180deg, rgba(255,255,255,0.03), transparent 25%),#0f131a}
+    .person{padding:14px;border-radius:14px;border:1px solid rgba(0,0,0,0.1);background:var(--surface)}
     .person h4{margin:0 0 6px}
     .meta{color:var(--muted);font-size:13px}
     .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-    .btn{padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:#0f1621;color:var(--text);cursor:pointer}
-    .btn:hover{border-color:rgba(125,211,252,0.6)}
+    .btn{padding:10px 12px;border-radius:10px;border:1px solid rgba(0,0,0,0.15);background:#fff;color:var(--text);cursor:pointer}
+    .btn:hover{border-color:rgba(2,132,199,0.6)}
 
     /* Jobs */
-    .job{padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,0.06);background:linear-gradient(180deg, rgba(255,255,255,0.03), transparent 25%),#0f131a}
+    .job{padding:14px;border-radius:14px;border:1px solid rgba(0,0,0,0.1);background:var(--surface)}
     .job h4{margin:0 0 4px}
     .job .company{color:var(--muted)}
     .badge{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid rgba(255,255,255,0.08);margin-left:6px}
@@ -105,7 +113,7 @@
       </div>
       <div class="tabs">
         <button class="tab active" data-tab="home"><i class="ti ti-home"></i>&nbsp;Home</button>
-        <button class="tab" data-tab="directory"><i class="ti ti-users"></i>&nbsp;Directory</button>
+        <button class="tab" data-tab="alumnis"><i class="ti ti-users"></i>&nbsp;Alumnis</button>
         <button class="tab" data-tab="jobs"><i class="ti ti-briefcase"></i>&nbsp;Jobs</button>
         <button class="tab" data-tab="impact"><i class="ti ti-chart-line"></i>&nbsp;Impact</button>
       </div>
@@ -125,14 +133,14 @@
         </div>
         <div>
           <a class="btn" id="join-link" target="_blank" rel="noopener">Join (Google Form)</a>
-          <a class="btn" href="#" onclick="switchTab('directory')">Browse directory</a>
+          <a class="btn" href="#" onclick="switchTab('alumnis')">Browse alumnis</a>
           <a class="btn" href="#" onclick="switchTab('jobs')">See open roles</a>
         </div>
       </div>
     </section>
 
     <!-- DIRECTORY -->
-    <section id="directory" class="card" hidden>
+    <section id="alumnis" class="card" hidden>
       <div class="controls">
         <input id="search" class="input" placeholder="Search name, org, skills…"/>
         <select id="filter-sector">
@@ -218,7 +226,7 @@
 
     // Deep-link on load
     const initHash = (location.hash||'').replace('#','');
-    if(['home','directory','jobs','impact'].includes(initHash)) switchTab(initHash);
+    if(['home','alumnis','jobs','impact'].includes(initHash)) switchTab(initHash);
 
     // Fetch JSON helpers with graceful fallback
     async function fetchJson(url){
@@ -336,8 +344,8 @@
           maintainAspectRatio:false,
           plugins:{ legend:{labels:{color:'var(--text)'}} },
           scales:{
-            x:{ ticks:{ color:'var(--muted)'}, grid:{color:'rgba(255,255,255,0.06)'} },
-            y:{ ticks:{ color:'var(--muted)'}, grid:{color:'rgba(255,255,255,0.06)'}, beginAtZero:true, precision:0 }
+            x:{ ticks:{ color:'var(--muted)'}, grid:{color:'rgba(0,0,0,0.08)'} },
+            y:{ ticks:{ color:'var(--muted)'}, grid:{color:'rgba(0,0,0,0.08)'}, beginAtZero:true, precision:0 }
           }
         }
       });
